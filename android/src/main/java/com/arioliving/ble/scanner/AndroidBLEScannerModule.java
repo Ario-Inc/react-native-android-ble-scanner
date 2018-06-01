@@ -28,6 +28,7 @@ public class AndroidBLEScannerModule extends ReactContextBaseJavaModule {
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mBluetoothScanner;
     private int mCompanyId = 0x00;
+    private boolean mScannerStarted = false;
 
     //Constructor
     public AndroidBLEScannerModule(ReactApplicationContext reactContext) {
@@ -41,8 +42,8 @@ public class AndroidBLEScannerModule extends ReactContextBaseJavaModule {
         }
 
         mBluetoothScanner = mBluetoothAdapter.getBluetoothLeScanner();
-
-    }
+        
+    }  
 
     @Override
     public String getName() {
@@ -56,12 +57,14 @@ public class AndroidBLEScannerModule extends ReactContextBaseJavaModule {
             
             byte[] rawAdv = result.getScanRecord().getManufacturerSpecificData(mCompanyId);
             
-            WritableNativeArray output = new WritableNativeArray();
-            for (int i = 0; i < rawAdv.length; i++) {
-                output.pushInt(rawAdv[i] & 0xFF);
+            if (rawAdv != null) {
+                WritableNativeArray output = new WritableNativeArray();
+                for (int i = 0; i < rawAdv.length; i++) {
+                    output.pushInt(rawAdv[i] & 0xFF);
+                }
+                mReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("scanResult",
+                        output);
             }
-            mReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("scanResult",
-                    output);           
             
         }
     };
@@ -73,11 +76,17 @@ public class AndroidBLEScannerModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void startScanner() {
-        mBluetoothScanner.startScan(leScanCallback);
+        if (!mScannerStarted) {
+            mBluetoothScanner.startScan(leScanCallback);
+            mScannerStarted = true;
+        }
     }
 
     @ReactMethod
     public void stopScanner() {
-        mBluetoothScanner.stopScan(leScanCallback);
+        if (mScannerStarted) {
+            mBluetoothScanner.stopScan(leScanCallback);
+            mScannerStarted = false;
+        }
     }
 }
