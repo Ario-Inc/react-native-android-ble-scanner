@@ -61,7 +61,7 @@ public class AndroidBLEScannerModule extends ReactContextBaseJavaModule {
             byte[] rawAdv = result.getScanRecord().getManufacturerSpecificData(mCompanyId);
             
             WritableNativeArray output = new WritableNativeArray();
-            for (int i = 0; i < encrypted.length; i++) {
+            for (int i = 0; i < rawAdv.length; i++) {
                 output.pushInt(rawAdv[i] & 0xFF);
             }
             mReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("scanResult",
