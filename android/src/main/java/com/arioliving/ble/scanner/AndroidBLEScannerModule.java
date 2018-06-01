@@ -49,10 +49,6 @@ public class AndroidBLEScannerModule extends ReactContextBaseJavaModule {
         return "AndroidBLEScannerModule";
     }
 
-    @ReactMethod
-    public void setThreshold(double threshold) {
-        mThreshold = (float) threshold;
-    }
 
     private ScanCallback leScanCallback = new ScanCallback() {
         @Override
@@ -70,14 +66,17 @@ public class AndroidBLEScannerModule extends ReactContextBaseJavaModule {
         }
     };
 
+    @ReactMethod
     public void setCompanyId(int companyId) {
         mCompanyId = companyId;
     }
 
+    @ReactMethod
     public void startScanner() {
         mBluetoothScanner.startScan(leScanCallback);
     }
 
+    @ReactMethod
     public void stopScanner() {
         mBluetoothScanner.stopScan(leScanCallback);
     }
